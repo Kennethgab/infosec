@@ -9,12 +9,13 @@
 
 {{ flash.error|raw }} <br />
 
+<b>Fields marked with * is required</b>
 <form action="" method="POST">
 
-<label>Username: </label>
-<input type="text" name="username"> <br />
-<label>Password: </label>
-<input type="text" name="password"> <br />
+<label>Username*: </label>
+<input type="text" name="username" required> <br />
+<label>Password*: </label>
+<input type="password" name="password" required> <br />
 <label>Email: </label>
 <input type="text" name="email"> <br />
 <label>Biography: </label>

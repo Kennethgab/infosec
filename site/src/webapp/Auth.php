@@ -17,13 +17,16 @@ class Auth
         if ($user === null) {
             return false;
         }
-
+/*
         if( $user->getPassword() == $password)
         {
           return true;
         }
         return false;
+*/
+	return password_verify($password, $user->getPassword());
     }
+
 
     /**
      * Check if is logged in.

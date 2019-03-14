@@ -28,11 +28,19 @@ class UserController extends Controller
         $request = $this->app->request;
         $username = $request->post('username');
         $password = $request->post('password');
-
+	
+	// Check that username is available
+	if (User::findByUser($username))
+	{
+	  $this->app->flash('info', 'Username taken!');
+          $this->app->redirect('/register');
+	}
 
         $user = User::makeEmpty();
         $user->setUsername($username);
-        $user->setPassword($password);
+
+	// Hashing password
+	$user->setPassword( password_hash($password, PASSWORD_DEFAULT) );
 
         if($request->post('email'))
         {
@@ -45,7 +53,6 @@ class UserController extends Controller
           $user->setBio($bio);
         }
 
-        
         $user->save();
         $this->app->flash('info', 'Thanks for creating a user. You may now log in.');
         $this->app->redirect('/login');
@@ -168,7 +175,7 @@ class UserController extends Controller
             
 
             $user->setUsername($username);
-            $user->setPassword($password);
+            $user->setPassword( password_hash($password, PASSWORD_DEFAULT) );
             $user->setBio($bio);
             $user->setEmail($email);
             $user->setIsAdmin($isAdmin);
