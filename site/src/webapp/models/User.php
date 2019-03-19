@@ -9,6 +9,18 @@ class User
     const DELETE_QUERY = "DELETE FROM users WHERE id='%s'";
     const FIND_BY_NAME_QUERY = "SELECT * FROM users WHERE username='%s'";
     const FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id='%s'";
+
+    protected $insertsql = "INSERT INTO users(username, password, email, bio, isadmin) VALUES(:username,:password,:email,:bio,:isadmin)";
+
+    protected $updatesql = "UPDATE users SET username=:username, password=:password, email=:email, bio=:bio, isadmin=:isadmin WHERE id=:id ";
+ 
+
+    protected $deletesql = "DELETE FROM users WHERe id=:id";
+
+    protected $findnamesql = "SELECT * FROM users WHERE id=:id";
+
+    protected $findidsql = "SELECT * FROM users where id=:id";
+
     protected $id = null;
     protected $username;
     protected $password;
@@ -42,14 +54,40 @@ class User
      */
     function save()
     {
-        if ($this->id === null) {
-            $query = sprintf(self::INSERT_QUERY,
+	    if ($this->id === null) {
+
+		$stmt = self::$app->db->prepare($this->insertsql);
+		return $stmt->execute([
+			':username' => $this->username,
+			':password' => $this->password,
+			':email'    => $this->email,
+			':bio'      => $this->bio,
+			':isadmin'  => $this->isAdmin,
+		]);
+	    
+	/**
+		$query = sprintf(self::INSERT_QUERY,
                 $this->username,
                 $this->password,
                 $this->email,
                 $this->bio,
-                $this->isAdmin            );
-        } else {
+		$this->isAdmin            
+		);
+	 */   
+	   
+	    } else {
+	$stmt = self::$app->db->prepare($this->updatesql);
+		return $stmt->execute([
+			':username' => $this->username,
+			':password' => $this->password,
+			':email'    => $this->email,
+			':bio'      => $this->bio,
+			':isadmin'  => $this->isAdmin,
+			':id'       => $this->id,
+		]);
+	    
+
+       /**		    
           $query = sprintf(self::UPDATE_QUERY,
                 $this->username,
                 $this->password,
@@ -57,18 +95,30 @@ class User
                 $this->bio,
                 $this->isAdmin,
                 $this->id
-            );
+	);
+
+		
+       	
+	*/
         }
 
-        return self::$app->db->exec($query);
+
+       //  return self::$app->db->exec($stmt);
     }
 
     function delete()
     {
+
+	    $stmt = self::$app->db->prepare($this->deletesql);
+	    	$stmt ->bindParam(':id', $this->id);
+		return $stmt->execute();
+
+	/**	    
         $query = sprintf(self::DELETE_QUERY,
             $this->id
         );
-        return self::$app->db->exec($query);
+	return self::$app->db->exec($query);
+	 */
     }
 
     function getId()
@@ -139,6 +189,18 @@ class User
      */
     static function findById($userid)
     {
+
+/**	
+        $stmt = self::$app->db->prepare(self::FIND_BY_ID_QUERY);
+	$stmt->bindParam(':id', $userid);
+	$row = $stmt->fetch(\PDO::FETCH_ASSOC);
+	if($row == false) {
+		return null;
+	}
+	return User::makeFromSql($row);
+ */	
+
+     
         $query = sprintf(self::FIND_BY_ID_QUERY, $userid);
         $result = self::$app->db->query($query, \PDO::FETCH_ASSOC);
         $row = $result->fetch();
@@ -147,7 +209,8 @@ class User
             return null;
         }
 
-        return User::makeFromSql($row);
+	return User::makeFromSql($row);
+     
     }
 
     /**
@@ -158,6 +221,18 @@ class User
      */
     static function findByUser($username)
     {
+
+/**	    
+	$stmt = self::$app->db->prepare(self::FIND_BY_NAME_QUERY);
+	$stmt->bindParam(':username', $username);
+	$row = $stmt->fetch(\PDO::FETCH_ASSOC);
+	if($row == false) {
+		return null;
+	}
+	return User::makeFromSql($row);
+ */	
+
+	   
         $query = sprintf(self::FIND_BY_NAME_QUERY, $username);
         $result = self::$app->db->query($query, \PDO::FETCH_ASSOC);
         $row = $result->fetch();
@@ -166,7 +241,9 @@ class User
             return null;
         }
 
-        return User::makeFromSql($row);
+	return User::makeFromSql($row);
+
+	
     }
 
     
@@ -201,4 +278,3 @@ class User
 
 
   User::$app = \Slim\Slim::getInstance();
-
