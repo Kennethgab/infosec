@@ -13,7 +13,7 @@ class User
     protected $insertsql = "INSERT INTO users(username, password, email, bio, isadmin) VALUES(:username,:password,:email,:bio,:isadmin)";
 
     protected $updatesql = "UPDATE users SET username=:username, password=:password, email=:email, bio=:bio, isadmin=:isadmin WHERE id=:id ";
- 
+
 
     protected $deletesql = "DELETE FROM users WHERe id=:id";
 
@@ -31,7 +31,7 @@ class User
     static $app;
 
 
-    static function make($id, $username, $password, $email, $bio, $isAdmin )
+    static function make($id, $username, $password, $email, $bio, $isAdmin)
     {
         $user = new User();
         $user->id = $id;
@@ -54,18 +54,18 @@ class User
      */
     function save()
     {
-	    if ($this->id === null) {
+        if ($this->id === null) {
 
-		$stmt = self::$app->db->prepare($this->insertsql);
-		return $stmt->execute([
-			':username' => $this->username,
-			':password' => $this->password,
-			':email'    => $this->email,
-			':bio'      => $this->bio,
-			':isadmin'  => $this->isAdmin,
-		]);
-	    
-	/**
+            $stmt = self::$app->db->prepare($this->insertsql);
+            return $stmt->execute([
+                ':username' => $this->username,
+                ':password' => $this->password,
+                ':email'    => $this->email,
+                ':bio'      => $this->bio,
+                ':isadmin'  => $this->isAdmin,
+            ]);
+
+            /**
 		$query = sprintf(self::INSERT_QUERY,
                 $this->username,
                 $this->password,
@@ -73,21 +73,20 @@ class User
                 $this->bio,
 		$this->isAdmin            
 		);
-	 */   
-	   
-	    } else {
-	$stmt = self::$app->db->prepare($this->updatesql);
-		return $stmt->execute([
-			':username' => $this->username,
-			':password' => $this->password,
-			':email'    => $this->email,
-			':bio'      => $this->bio,
-			':isadmin'  => $this->isAdmin,
-			':id'       => $this->id,
-		]);
-	    
+	 */
+        } else {
+            $stmt = self::$app->db->prepare($this->updatesql);
+            return $stmt->execute([
+                ':username' => $this->username,
+                ':password' => $this->password,
+                ':email'    => $this->email,
+                ':bio'      => $this->bio,
+                ':isadmin'  => $this->isAdmin,
+                ':id'       => $this->id,
+            ]);
 
-       /**		    
+
+            /**		    
           $query = sprintf(self::UPDATE_QUERY,
                 $this->username,
                 $this->password,
@@ -103,17 +102,17 @@ class User
         }
 
 
-       //  return self::$app->db->exec($stmt);
+        //  return self::$app->db->exec($stmt);
     }
 
     function delete()
     {
 
-	    $stmt = self::$app->db->prepare($this->deletesql);
-	    	$stmt ->bindParam(':id', $this->id);
-		return $stmt->execute();
+        $stmt = self::$app->db->prepare($this->deletesql);
+        $stmt->bindParam(':id', $this->id);
+        return $stmt->execute();
 
-	/**	    
+        /**	    
         $query = sprintf(self::DELETE_QUERY,
             $this->id
         );
@@ -190,16 +189,19 @@ class User
     static function findById($userid)
     {
 
-/**	
-        $stmt = self::$app->db->prepare(self::FIND_BY_ID_QUERY);
-	$stmt->bindParam(':id', $userid);
-	$row = $stmt->fetch(\PDO::FETCH_ASSOC);
-	if($row == false) {
-		return null;
-	}
-	return User::makeFromSql($row);
- */	
+        $idsql  = "SELECT * FROM users WHERE id=:id";
 
+        $stmt = self::$app->db->prepare($idsql);
+        $stmt->bindParam(':id', $userid);
+        $stmt->execute();
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if ($row == false) {
+            return null;
+        }
+        return User::makeFromSql($row);
+    }
+    /**
      
         $query = sprintf(self::FIND_BY_ID_QUERY, $userid);
         $result = self::$app->db->query($query, \PDO::FETCH_ASSOC);
@@ -212,6 +214,8 @@ class User
 	return User::makeFromSql($row);
      
     }
+ */
+
 
     /**
      * Find user in db by username.
@@ -222,17 +226,18 @@ class User
     static function findByUser($username)
     {
 
-/**	    
-	$stmt = self::$app->db->prepare(self::FIND_BY_NAME_QUERY);
-	$stmt->bindParam(':username', $username);
-	$row = $stmt->fetch(\PDO::FETCH_ASSOC);
-	if($row == false) {
-		return null;
-	}
-	return User::makeFromSql($row);
- */	
 
-	   
+        $usersql = "SELECT * FROM users WHERE username=:username";
+        $stmt = self::$app->db->prepare($usersql);
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if ($row == false) {
+            return null;
+        }
+        return User::makeFromSql($row);
+    }
+    /**	   
         $query = sprintf(self::FIND_BY_NAME_QUERY, $username);
         $result = self::$app->db->query($query, \PDO::FETCH_ASSOC);
         $row = $result->fetch();
@@ -245,8 +250,8 @@ class User
 
 	
     }
+ */
 
-    
     static function all()
     {
         $query = "SELECT * FROM users";
@@ -273,8 +278,7 @@ class User
             $row['isadmin']
         );
     }
-
 }
 
 
-  User::$app = \Slim\Slim::getInstance();
+User::$app = \Slim\Slim::getInstance();
