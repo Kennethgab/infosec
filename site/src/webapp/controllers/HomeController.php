@@ -15,8 +15,8 @@ class HomeController extends Controller
     function index()     
     {
         if (Auth::check()) {
-            $user = Auth::user();
-            $this->render('base.twig', []);
+	    $user = Auth::user();
+	    $this->render('base.twig', []);
         } else {
             $this->render('base.twig',[]);
         }
