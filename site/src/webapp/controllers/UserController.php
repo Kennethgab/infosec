@@ -38,6 +38,23 @@ class UserController extends Controller
 
         $user = User::makeEmpty();
         $user->setUsername($username);
+        
+        // Password validation
+        if(!empty($password) {
+            if(mb_strlen(trim($password)) < 8 || mb_strlen(trim($password)) > 32) {
+                $this->app->flash("Password must be between 8 and 32 characters!");
+                exit();
+            }
+            elseif (!preg_match("^[a-zA-Z0-9]{1,}$", $password)) {
+                $this->app->flash("info", "Password must contain at least 1 alphanumeric character!");
+                exit();
+            }
+            elseif (!preg_match("#[A-Z]+#", $password) {
+                $this->app->flash("info", "Password must contain at least 1 uppercase letter!");
+                exit();
+            }
+        }
+
 
 	// Hashing password
 	$user->setPassword( password_hash($password, PASSWORD_DEFAULT) );
